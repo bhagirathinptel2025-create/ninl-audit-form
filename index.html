@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NINL Fire Safety Audit Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--fire:#FF3B00;--ember:#FF7A00;--smoke:#1A1A1A;--ash:#2D2D2D;--char:#3D3D3D;--fog:#6B6B6B;--mist:#A0A0A0;--snow:#F5F5F0;--safe:#00C853;--warn:#FFB800;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--smoke);color:var(--snow);font-family:'IBM Plex Sans',sans-serif;min-height:100vh;}
+  #pwdScreen{position:fixed;inset:0;background:linear-gradient(135deg,#0d0d0d,#1a0500,#0d0d0d);z-index:9999;display:flex;align-items:center;justify-content:center;}
+  .pwd-box{background:#1e1e1e;border:1px solid #3d3d3d;border-top:3px solid var(--fire);padding:48px 56px;width:420px;text-align:center;}
+  .pwd-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:var(--snow);margin:12px 0 4px;}
+  .pwd-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fog);letter-spacing:2px;margin-bottom:32px;}
+  .pwd-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--fog);text-align:left;margin-bottom:8px;display:block;}
+  .pwd-input{width:100%;background:#0d0d0d;border:1px solid #3d3d3d;border-bottom:2px solid var(--fire);padding:14px 16px;color:var(--snow);font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:4px;outline:none;text-align:center;margin-bottom:20px;}
+  .pwd-input:focus{border-bottom-color:var(--ember);}
+  .pwd-btn{width:100%;background:var(--fire);color:#fff;border:none;padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;transition:background 0.2s;}
+  .pwd-btn:hover{background:var(--ember);}
+  .pwd-error{margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fire);letter-spacing:1px;min-height:18px;}
+  .pwd-footer{margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#3d3d3d;letter-spacing:1px;}
+  header{background:linear-gradient(135deg,#0d0d0d,#1a0a00,#0d0d0d);border-bottom:2px solid var(--fire);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:100;box-shadow:0 4px 40px rgba(255,59,0,0.2);}
+  .logo{display:flex;align-items:center;gap:12px;}
+  .logo-text{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--snow);}
+  .logo-text span{color:var(--fire);}
+  .header-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--warn);letter-spacing:2px;border:1px solid rgba(255,184,0,0.3);padding:6px 14px;}
+  .banner{display:none;padding:14px 32px;align-items:center;gap:14px;}
+  .banner.show{display:flex;}
+  .banner.warn{background:linear-gradient(90deg,rgba(255,184,0,0.13),rgba(255,184,0,0.04));border-bottom:1px solid rgba(255,184,0,0.3);border-left:4px solid var(--warn);}
+  .banner.danger{background:linear-gradient(90deg,rgba(255,59,0,0.16),rgba(255,59,0,0.04));border-bottom:1px solid rgba(255,59,0,0.3);border-left:4px solid var(--fire);}
+  .banner.overdue{background:linear-gradient(90deg,rgba(213,0,0,0.18),rgba(213,0,0,0.04));border-bottom:1px solid rgba(213,0,0,0.4);border-left:4px solid #D50000;}
+  .banner-text{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;}
+  .form-wrap{padding:28px 32px;max-width:1200px;margin:0 auto;}
+  .form-header{background:linear-gradient(135deg,#1a0a00,#0d0d0d);border:1px solid var(--char);border-top:3px solid var(--fire);padding:28px 32px;margin-bottom:28px;}
+  .form-header h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;}
+  .form-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px;}
+  .field-group{display:flex;flex-direction:column;gap:6px;}
+  .field-label{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fog);}
+  .field-input{background:var(--smoke);border:1px solid var(--char);border-bottom:2px solid var(--fire);padding:10px 14px;color:var(--snow);font-family:'IBM Plex Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;width:100%;}
+  .field-input:focus{border-color:var(--ember);background:#0f0f0f;}
+  select.field-input option{background:var(--ash);}
+  .checklist-section{background:var(--ash);border:1px solid var(--char);margin-bottom:20px;}
+  .section-header{background:linear-gradient(90deg,rgba(255,59,0,0.12),transparent);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--char);}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:2px;display:flex;align-items:center;gap:10px;}
+  .section-prog{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fog);}
+  .checklist-item{display:grid;grid-template-columns:28px 1fr auto auto;align-items:start;gap:14px;padding:14px 24px;border-bottom:1px solid rgba(61,61,61,0.4);transition:background 0.15s;}
+  .checklist-item:hover{background:rgba(255,59,0,0.03);}
+  .checklist-item:last-child{border-bottom:none;}
+  .item-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fire);font-weight:600;padding-top:2px;}
+  .item-text{font-size:13px;color:var(--snow);line-height:1.5;}
+  .item-text small{display:block;font-size:11px;color:var(--fog);margin-top:2px;font-style:italic;}
+  .comp-btns{display:flex;gap:5px;flex-shrink:0;}
+  .comp-btn{padding:6px 12px;border:1px solid var(--char);background:transparent;color:var(--fog);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .comp-btn.yes.sel{background:rgba(0,200,83,0.2);color:var(--safe);border-color:var(--safe);}
+  .comp-btn.no.sel{background:rgba(255,59,0,0.2);color:var(--fire);border-color:var(--fire);}
+  .comp-btn.na.sel{background:rgba(107,107,107,0.2);color:var(--mist);border-color:var(--mist);}
+  .obs-input{background:var(--smoke);border:1px solid var(--char);padding:7px 10px;color:var(--snow);font-family:'IBM Plex Sans',sans-serif;font-size:12px;width:200px;outline:none;resize:none;min-height:38px;transition:border-color 0.2s;}
+  .obs-input:focus{border-color:var(--ember);}
+  .obs-input::placeholder{color:var(--char);font-style:italic;}
+  .form-footer{background:var(--ash);border:1px solid var(--char);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;margin-top:24px;}
+  .score-preview{display:flex;align-items:center;gap:20px;}
+  .live-score{font-family:'Bebas Neue',sans-serif;font-size:60px;color:var(--fire);line-height:1;letter-spacing:2px;}
+  .score-info{color:var(--fog);font-size:11px;font-family:'IBM Plex Mono',monospace;}
+  .submit-btn{background:var(--fire);color:#fff;border:none;padding:16px 44px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;}
+  .submit-btn:hover{background:var(--ember);transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,59,0,0.4);}
+  .submit-btn:disabled{background:var(--char);cursor:not-allowed;transform:none;box-shadow:none;}
+  #successScreen{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;}
+  .success-box{background:var(--ash);border:1px solid var(--char);border-top:3px solid var(--safe);padding:48px 56px;max-width:480px;text-align:center;}
+  .success-icon{font-size:64px;margin-bottom:16px;}
+  .success-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:var(--safe);margin-bottom:8px;}
+  .success-score{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;margin:12px 0;}
+  .next-audit-box{background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.4);padding:14px 20px;margin:16px 0;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--warn);letter-spacing:1px;}
+  .new-btn{background:var(--fire);color:#fff;border:none;padding:14px 36px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;}
+  .new-btn:hover{background:var(--ember);}
+  .toast{position:fixed;bottom:28px;right:28px;background:var(--ash);border-left:4px solid var(--fire);color:var(--snow);padding:14px 22px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;z-index:9999;transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);max-width:360px;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.ok{border-left-color:var(--safe);}
+  ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:var(--smoke);} ::-webkit-scrollbar-thumb{background:var(--char);} ::-webkit-scrollbar-thumb:hover{background:var(--fire);}
+</style>
+</head>
+<body>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    databaseURL: "https://ninl-fire-audit-default-rtdb.firebaseio.com"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Expose to global
+  window._fbPush = (data) => push(ref(db, 'audits'), data);
+  window._fbGetLastDate = async () => {
+    const snap = await get(child(ref(db), 'audits'));
+    if (!snap.exists()) return null;
+    const all = Object.values(snap.val());
+    all.sort((a,b) => new Date(b.date) - new Date(a.date));
+    return all[0]?.date || null;
+  };
+  window._fbReady = true;
+
+  // Load banner after Firebase ready
+  setTimeout(loadBanner, 800);
+</script>
+
+<!-- PASSWORD SCREEN -->
+<div id="pwdScreen">
+  <div class="pwd-box">
+    <div style="display:flex;justify-content:center;margin-bottom:12px;">
+      <svg viewBox="0 0 100 100" width="72" height="72" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,4 96,42 96,48 50,10 4,48 4,42" fill="#2222CC"/>
+        <rect x="4" y="50" width="92" height="10" fill="#2222CC"/>
+        <circle cx="50" cy="34" r="10" fill="#2222CC"/>
+        <rect x="4" y="63" width="92" height="33" fill="white"/>
+        <text x="50" y="90" font-family="Arial Black,Arial" font-weight="900" font-size="22" fill="#2222CC" text-anchor="middle" letter-spacing="4">NINL</text>
+      </svg>
+    </div>
+    <div class="pwd-title">FIRE SAFETY AUDIT</div>
+    <div class="pwd-sub">// AUTHORIZED INSPECTORS ONLY</div>
+    <label class="pwd-label">Enter Access Password</label>
+    <input class="pwd-input" id="pwdInput" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') checkPwd()">
+    <button class="pwd-btn" onclick="checkPwd()">ACCESS FORM →</button>
+    <div class="pwd-error" id="pwdError"></div>
+    <div class="pwd-footer">NINL FIRE SERVICE — FIELD AUDIT SYSTEM</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 100 100" width="44" height="44" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 96,42 96,48 50,10 4,48 4,42" fill="#2222CC"/>
+      <rect x="4" y="50" width="92" height="10" fill="#2222CC"/>
+      <circle cx="50" cy="34" r="10" fill="#2222CC"/>
+      <rect x="4" y="63" width="92" height="33" fill="white"/>
+      <text x="50" y="90" font-family="Arial Black,Arial" font-weight="900" font-size="22" fill="#2222CC" text-anchor="middle" letter-spacing="4">NINL</text>
+    </svg>
+    <div class="logo-text">NINL <span>FIRE</span> SAFETY AUDIT</div>
+  </div>
+  <div class="header-badge">⚠ FIELD INSPECTION FORM</div>
+</header>
+
+<!-- NEXT AUDIT REMINDER BANNER -->
+<div id="auditBanner" class="banner"></div>
+
+<!-- SUCCESS SCREEN -->
+<div id="successScreen">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <div class="success-title">AUDIT SUBMITTED</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fog);letter-spacing:1px;">COMPLIANCE SCORE</div>
+    <div class="success-score" id="successScore">—</div>
+    <div id="successRisk" style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:2px;margin-bottom:8px;"></div>
+    <div class="next-audit-box" id="successNext"></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fog);margin-bottom:20px;">Data saved to cloud. Admin dashboard updated.</div>
+    <button class="new-btn" onclick="resetForm()">+ NEW AUDIT</button>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap">
+  <div class="form-header">
+    <h2>🔥 FIRE SAFETY INSPECTION FORM</h2>
+    <div class="form-meta">
+      <div class="field-group">
+        <label class="field-label">Site / Location Name *</label>
+        <input class="field-input" id="siteName" type="text" placeholder="e.g. Building A — Floor 3">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Inspector Name *</label>
+        <input class="field-input" id="inspectorName" type="text" placeholder="Full name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Designation *</label>
+        <input class="field-input" id="designation" type="text" placeholder="e.g. Fire Safety Officer">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Employee ID</label>
+        <input class="field-input" id="empId" type="text" placeholder="e.g. NINL-2345">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Audit Date *</label>
+        <input class="field-input" id="auditDate" type="date">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Site Type</label>
+        <select class="field-input" id="siteType">
+          <option value="">Select type...</option>
+          <option>Office Building</option>
+          <option>Warehouse / Industrial</option>
+          <option>Hospital / Healthcare</option>
+          <option>School / Educational</option>
+          <option>Retail / Commercial</option>
+          <option>Hotel / Hospitality</option>
+          <option>Residential Complex</option>
+          <option>Factory / Manufacturing</option>
+          <option>MCC / Panel Room</option>
+          <option>Transformer Yard</option>
+          <option>Conveyor Gallery</option>
+          <option>Cable Vault / Tunnel</option>
+          <option>Pump House</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Department / Zone</label>
+        <input class="field-input" id="deptZone" type="text" placeholder="e.g. Ground Floor, North Wing">
+      </div>
+    </div>
+  </div>
+
+  <div id="checklistContainer"></div>
+
+  <div class="form-footer">
+    <div class="score-preview">
+      <div class="live-score" id="liveScore">—</div>
+      <div>
+        <div class="score-info" id="scoreDetail">Answer items to calculate</div>
+        <div class="score-info" id="riskLabel" style="margin-top:4px;"></div>
+      </div>
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitAudit()">SUBMIT AUDIT →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CHECKLIST = [
+  {id:'fire_ext',title:'Fire Extinguishers',icon:'🧯',items:[
+    {id:'fe1',text:'Fire extinguishers available at all designated locations',note:'Check all required areas per layout plan'},
+    {id:'fe2',text:'Extinguishers properly mounted, labelled and accessible',note:'Not blocked or obstructed by any material'},
+    {id:'fe3',text:'Inspection tags current (within 12 months)',note:'Verify last service date on tag'},
+    {id:'fe4',text:'Pressure gauges indicate full charge (green zone)',note:'Visual check of all gauges'},
+    {id:'fe5',text:'Safety pins and tamper seals intact',note:'Ensure no unauthorized use has occurred'},
+    {id:'fe6',text:'Type of extinguisher matches fire hazard class of area',note:'ABC, CO2, DCP, Wet Chemical as applicable'},
+    {id:'fe7',text:'Extinguisher weight / discharge condition verified',note:'Weigh CO2 cylinders; check DCP for caking'},
+  ]},
+  {id:'alarm',title:'Fire Alarm Systems',icon:'🚨',items:[
+    {id:'al1',text:'Fire alarm control panel functional — normal status',note:'No active faults or zone isolations'},
+    {id:'al2',text:'Manual call points accessible and unobstructed',note:'Check all zones; test one per visit'},
+    {id:'al3',text:'Smoke and heat detectors clean and undamaged',note:'No paint, dust covers, or physical damage'},
+    {id:'al4',text:'Alarm sounders and visual strobe alarms functional',note:'Record last tested date'},
+    {id:'al5',text:'Alarm test records maintained and up to date',note:'Weekly/monthly test log available'},
+    {id:'al6',text:'Alarm system battery backup operational and charged',note:'Min. 24hr standby + 30min alarm capacity'},
+  ]},
+  {id:'evacuation',title:'Evacuation & Emergency',icon:'🚪',items:[
+    {id:'ev1',text:'Emergency exit routes clearly marked with illuminated signage',note:'Check all exit signs are lit and visible'},
+    {id:'ev2',text:'Exit routes and stairwells completely clear of obstructions',note:'No storage, equipment, or debris blocking'},
+    {id:'ev3',text:'Emergency lighting functional',note:'Battery backup units tested monthly'},
+    {id:'ev4',text:'Fire doors properly installed and self-closing',note:'No propped-open or damaged fire doors'},
+    {id:'ev5',text:'Assembly point clearly marked and communicated to all staff',note:'Signage visible from building exterior'},
+    {id:'ev6',text:'Evacuation plan (floor map) posted on each floor/zone',note:'Current version, legible and undamaged'},
+    {id:'ev7',text:'Fire evacuation drill conducted within last 6 months',note:'Drill records with date and outcome available'},
+  ]},
+  {id:'suppression',title:'Sprinkler & Suppression Systems',icon:'💧',items:[
+    {id:'sp1',text:'Sprinkler heads unobstructed (minimum 500mm clearance)',note:'No storage stacked under sprinkler heads'},
+    {id:'sp2',text:'Sprinkler control valves open, locked or supervised',note:'Verify OS&Y or butterfly valve status'},
+    {id:'sp3',text:'Annual suppression system inspection current',note:'Third-party inspection certificate available'},
+    {id:'sp4',text:'Fire pump (jockey, main, diesel) operational status verified',note:'Check run logs and pressure readings'},
+    {id:'sp5',text:'Fire water tank/reservoir level adequate',note:'Minimum reserve per design specification'},
+    {id:'sp6',text:'No leaks, corrosion or damage on pipework',note:'Visual inspection of exposed piping'},
+  ]},
+  {id:'hazards',title:'General Hazard Management',icon:'⚠️',items:[
+    {id:'hz1',text:'Flammable and combustible materials properly stored',note:'Correct containers, ventilated storage areas'},
+    {id:'hz2',text:'No unauthorized combustible storage in work areas',note:'Check corridors, under stairs, plant rooms'},
+    {id:'hz3',text:'Electrical panels accessible with minimum 1m clearance',note:'No storage in front of panels'},
+    {id:'hz4',text:'Electrical equipment in good condition — no visible damage',note:'Check for frayed cables, overloaded sockets'},
+    {id:'hz5',text:'Hot work permit system active and enforced',note:'PTW for all welding, cutting, grinding work'},
+    {id:'hz6',text:'No smoking in all designated no-smoking areas',note:'Signage visible, enforcement verified'},
+    {id:'hz7',text:'Waste and debris regularly cleared from work areas',note:'No accumulation of combustible waste'},
+  ]},
+  {id:'office_building',title:'Office Building Fire Protection',icon:'🏢',items:[
+    {id:'ob1',text:'CO2/DCP extinguishers near electrical equipment and server rooms',note:'One per 200 sqm or as per layout'},
+    {id:'ob2',text:'Smoke detectors in all rooms, cabins, server rooms and false ceilings',note:'No gaps in coverage; test last date re
